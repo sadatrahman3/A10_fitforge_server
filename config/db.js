@@ -6,6 +6,5 @@ export const connectDB = async () => {
     console.log('MongoDB connected to FitForge');
   } catch (error) {
     console.error('MongoDB connection error:', error.message);
-    process.exit(1);
   }
 };
