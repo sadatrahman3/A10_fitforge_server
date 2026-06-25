@@ -13,14 +13,7 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: (origin, callback) => {
-    const allowed = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map(s => s.trim());
-    if (!origin || allowed.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: '*',
   credentials: true,
 }));
 app.use(express.json());
@@ -69,4 +62,11 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`FitForge server running on port ${PORT}`);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Rejection:', err);
 });
