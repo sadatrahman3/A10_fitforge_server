@@ -16,7 +16,7 @@ router.post('/register', async (req, res) => {
     res.cookie('fitforge_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -40,7 +40,7 @@ router.post('/login', async (req, res) => {
     res.cookie('fitforge_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -60,8 +60,27 @@ router.get('/me', verifyToken, async (req, res) => {
   }
 });
 
+router.put('/update-profile', verifyToken, async (req, res) => {
+  try {
+    const { name, photoURL } = req.body;
+    const updates = {};
+    if (name) updates.name = name;
+    if (photoURL !== undefined) updates.photoURL = photoURL;
+
+    const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true }).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.post('/logout', (req, res) => {
-  res.clearCookie('fitforge_token');
+  res.clearCookie('fitforge_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  });
   res.json({ message: 'Logged out' });
 });
 

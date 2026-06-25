@@ -3,6 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { connectDB } from './config/db.js';
+import FitnessClass from './models/FitnessClass.js';
+import ForumPost from './models/ForumPost.js';
+import User from './models/User.js';
 
 dotenv.config();
 connectDB();
@@ -18,6 +21,17 @@ app.use(cookieParser());
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'FitForge API' });
+});
+
+app.get('/api/stats', async (req, res) => {
+  try {
+    const totalClasses = await FitnessClass.countDocuments({ status: 'approved' });
+    const totalPosts = await ForumPost.countDocuments();
+    const totalUsers = await User.countDocuments();
+    res.json({ totalClasses, totalPosts, totalUsers });
+  } catch (error) {
+    res.json({ totalClasses: 0, totalPosts: 0, totalUsers: 0 });
+  }
 });
 
 import authRoutes from './routes/auth.js';
