@@ -3,14 +3,14 @@ import Stripe from 'stripe';
 import Payment from '../models/Payment.js';
 import { verifyToken } from '../middleware/auth.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const getStripe = () => new Stripe(process.env.STRIPE_SECRET_KEY);
 const router = express.Router();
 
 router.post('/create-checkout-session', verifyToken, async (req, res) => {
   try {
     const { classId, className, price, trainerName } = req.body;
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
         price_data: {
