@@ -1,0 +1,26 @@
+{
+  "name": "fitforge-server",
+  "version": "1.0.0",
+  "description": "FitForge Fitness & Gym Management Platform - Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": ["fitness", "gym", "management"],
+  "author": "FitForge",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-auth": "^1.6.20",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "imgbb-uploader": "^1.5.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.7.2",
+    "stripe": "^22.3.0"
+  }
+}
