@@ -1,3 +1,7 @@
+Admin Login:- admin@fitforge.com
+Admin Password:- Aa12345
+
+
 # FitForge - Fitness & Gym Management Platform
 
 **Live Site:** https://a10-fitforge-client.vercel.app
