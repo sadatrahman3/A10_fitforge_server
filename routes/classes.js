@@ -1,6 +1,6 @@
 import express from 'express';
 import FitnessClass from '../models/FitnessClass.js';
-import { verifyToken, requireRole } from '../middleware/auth.js';
+import { verifyToken, requireRole, requireActiveUser } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -37,6 +37,15 @@ router.get('/featured', async (req, res) => {
   }
 });
 
+router.get('/my', verifyToken, requireRole('trainer', 'admin'), async (req, res) => {
+  try {
+    const classes = await FitnessClass.find({ trainerId: req.user.id }).sort({ createdAt: -1 });
+    res.json(classes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const cls = await FitnessClass.findById(req.params.id);
@@ -47,7 +56,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', verifyToken, requireRole('trainer', 'admin'), async (req, res) => {
+router.post('/', verifyToken, requireActiveUser, requireRole('trainer', 'admin'), async (req, res) => {
   try {
     const cls = await FitnessClass.create({ ...req.body, trainerId: req.user.id, status: 'pending' });
     res.status(201).json(cls);
@@ -56,7 +65,7 @@ router.post('/', verifyToken, requireRole('trainer', 'admin'), async (req, res) 
   }
 });
 
-router.put('/:id', verifyToken, requireRole('trainer', 'admin'), async (req, res) => {
+router.put('/:id', verifyToken, requireActiveUser, requireRole('trainer', 'admin'), async (req, res) => {
   try {
     const cls = await FitnessClass.findById(req.params.id);
     if (!cls) return res.status(404).json({ message: 'Class not found' });
@@ -70,7 +79,7 @@ router.put('/:id', verifyToken, requireRole('trainer', 'admin'), async (req, res
   }
 });
 
-router.delete('/:id', verifyToken, requireRole('trainer', 'admin'), async (req, res) => {
+router.delete('/:id', verifyToken, requireActiveUser, requireRole('trainer', 'admin'), async (req, res) => {
   try {
     const cls = await FitnessClass.findById(req.params.id);
     if (!cls) return res.status(404).json({ message: 'Class not found' });

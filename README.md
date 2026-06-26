@@ -1,6 +1,7 @@
 # FitForge - Fitness & Gym Management Platform
 
-**Live Site:** https://fitforge.vercel.app  
+**Live Site:** https://a10-fitforge-client.vercel.app
+**Server API:** https://a10-fitforge-server.onrender.com
 **Client Repo:** https://github.com/sadatrahman3/A10_fitforge_client  
 **Server Repo:** https://github.com/sadatrahman3/A10_fitforge_server
 
@@ -46,3 +47,11 @@ FitForge is a comprehensive fitness management platform designed for fitness ent
 - `cookie-parser` - Cookie parsing
 - `stripe` - Payment processing
 - `better-auth` - Authentication utilities
+
+## Environment Variables
+- `MONGODB_URI` - MongoDB connection string.
+- `JWT_SECRET` - Secret for JWT signing and verification.
+- `CLIENT_URL` - Primary deployed client URL. Use `https://a10-fitforge-client.vercel.app`.
+- `ALLOWED_ORIGINS` - Optional comma-separated extra origins for previews/local clients.
+- `GOOGLE_CLIENT_ID` - Google Identity Services client ID for Google login.
+- `STRIPE_SECRET_KEY` - Stripe secret key for checkout sessions.

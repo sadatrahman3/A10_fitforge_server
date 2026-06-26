@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { connectDB } from './config/db.js';
+import { isAllowedOrigin } from './config/app.js';
 import FitnessClass from './models/FitnessClass.js';
 import ForumPost from './models/ForumPost.js';
 import User from './models/User.js';
@@ -14,14 +15,15 @@ const app = express();
 
 app.use(cors({
   origin: function (origin, callback) {
-    const allowed = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map(s => s.trim());
-    if (!origin || allowed.includes(origin)) {
-      callback(null, origin);
+    if (isAllowedOrigin(origin)) {
+      callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json());
 app.use(cookieParser());

@@ -1,10 +1,10 @@
 import express from 'express';
 import User from '../models/User.js';
-import { verifyToken, requireRole } from '../middleware/auth.js';
+import { verifyToken, requireRole, requireActiveUser } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post('/apply', verifyToken, async (req, res) => {
+router.post('/apply', verifyToken, requireActiveUser, async (req, res) => {
   try {
     const { experience, specialty, availability } = req.body;
     const user = await User.findById(req.user.id);

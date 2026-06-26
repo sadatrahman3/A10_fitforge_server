@@ -1,6 +1,6 @@
 import express from 'express';
 import Favorite from '../models/Favorite.js';
-import { verifyToken } from '../middleware/auth.js';
+import { verifyToken, requireActiveUser } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -22,7 +22,7 @@ router.get('/check/:classId', verifyToken, async (req, res) => {
   }
 });
 
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', verifyToken, requireActiveUser, async (req, res) => {
   try {
     const { classId } = req.body;
     const existing = await Favorite.findOne({ userId: req.user.id, classId });
@@ -35,7 +35,7 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
-router.delete('/:classId', verifyToken, async (req, res) => {
+router.delete('/:classId', verifyToken, requireActiveUser, async (req, res) => {
   try {
     await Favorite.findOneAndDelete({ userId: req.user.id, classId: req.params.classId });
     res.json({ message: 'Removed from favorites' });

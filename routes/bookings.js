@@ -1,7 +1,7 @@
 import express from 'express';
 import Booking from '../models/Booking.js';
 import FitnessClass from '../models/FitnessClass.js';
-import { verifyToken } from '../middleware/auth.js';
+import { verifyToken, requireActiveUser } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -25,6 +25,11 @@ router.get('/check/:classId', verifyToken, async (req, res) => {
 
 router.get('/class/:classId', verifyToken, async (req, res) => {
   try {
+    const cls = await FitnessClass.findById(req.params.classId);
+    if (!cls) return res.status(404).json({ message: 'Class not found' });
+    if (req.user.role !== 'admin' && cls.trainerId.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
     const bookings = await Booking.find({ classId: req.params.classId }).populate('userId', 'name email photoURL');
     res.json(bookings);
   } catch (error) {
@@ -32,7 +37,7 @@ router.get('/class/:classId', verifyToken, async (req, res) => {
   }
 });
 
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', verifyToken, requireActiveUser, async (req, res) => {
   try {
     const { classId, transactionId } = req.body;
     const cls = await FitnessClass.findById(classId);
@@ -54,6 +59,7 @@ router.post('/', verifyToken, async (req, res) => {
 
     res.status(201).json(booking);
   } catch (error) {
+    if (error.code === 11000) return res.status(400).json({ message: 'Already booked' });
     res.status(500).json({ message: error.message });
   }
 });

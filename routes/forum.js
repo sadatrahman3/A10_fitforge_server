@@ -1,6 +1,6 @@
 import express from 'express';
 import ForumPost from '../models/ForumPost.js';
-import { verifyToken, requireRole } from '../middleware/auth.js';
+import { verifyToken, requireRole, requireActiveUser } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -37,7 +37,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', verifyToken, requireRole('trainer', 'admin'), async (req, res) => {
+router.post('/', verifyToken, requireActiveUser, requireRole('trainer', 'admin'), async (req, res) => {
   try {
     const post = await ForumPost.create({
       ...req.body,
@@ -51,7 +51,7 @@ router.post('/', verifyToken, requireRole('trainer', 'admin'), async (req, res) 
   }
 });
 
-router.post('/:id/like', verifyToken, async (req, res) => {
+router.post('/:id/like', verifyToken, requireActiveUser, async (req, res) => {
   try {
     const post = await ForumPost.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
@@ -70,7 +70,7 @@ router.post('/:id/like', verifyToken, async (req, res) => {
   }
 });
 
-router.post('/:id/dislike', verifyToken, async (req, res) => {
+router.post('/:id/dislike', verifyToken, requireActiveUser, async (req, res) => {
   try {
     const post = await ForumPost.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
@@ -89,7 +89,7 @@ router.post('/:id/dislike', verifyToken, async (req, res) => {
   }
 });
 
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', verifyToken, requireActiveUser, async (req, res) => {
   try {
     const post = await ForumPost.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });

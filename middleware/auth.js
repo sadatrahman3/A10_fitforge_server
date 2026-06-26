@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 export const generateToken = (user) => {
   return jwt.sign(
@@ -14,11 +15,28 @@ export const verifyToken = (req, res, next) => {
     if (!token) return res.status(401).json({ message: 'Authentication required' });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
+    User.findById(decoded.id).select('-password').then((user) => {
+      if (!user) return res.status(401).json({ message: 'User not found' });
+      req.user = {
+        id: user._id.toString(),
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        name: user.name,
+        photoURL: user.photoURL,
+      };
+      next();
+    }).catch(() => res.status(401).json({ message: 'Invalid or expired token' }));
   } catch (error) {
     return res.status(401).json({ message: 'Invalid or expired token' });
   }
+};
+
+export const requireActiveUser = (req, res, next) => {
+  if (req.user?.status === 'blocked') {
+    return res.status(403).json({ message: 'Action restricted by Admin' });
+  }
+  next();
 };
 
 export const requireRole = (...roles) => {

@@ -1,6 +1,6 @@
 import express from 'express';
 import Comment from '../models/Comment.js';
-import { verifyToken } from '../middleware/auth.js';
+import { verifyToken, requireActiveUser } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ router.get('/:postId', async (req, res) => {
   }
 });
 
-router.post('/', verifyToken, async (req, res) => {
+router.post('/', verifyToken, requireActiveUser, async (req, res) => {
   try {
     const comment = await Comment.create({
       ...req.body,
@@ -27,7 +27,7 @@ router.post('/', verifyToken, async (req, res) => {
   }
 });
 
-router.put('/:id', verifyToken, async (req, res) => {
+router.put('/:id', verifyToken, requireActiveUser, async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id);
     if (!comment) return res.status(404).json({ message: 'Comment not found' });
@@ -40,7 +40,7 @@ router.put('/:id', verifyToken, async (req, res) => {
   }
 });
 
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', verifyToken, requireActiveUser, async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id);
     if (!comment) return res.status(404).json({ message: 'Comment not found' });
